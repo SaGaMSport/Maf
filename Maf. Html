@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensorwert-Tabelle mit Validierung</title>
+    <script>
+        function berechneWerte() {
+            const originalDurchmesser = parseFloat(document.getElementById("originalDurchmesser").value);
+            const neuerDurchmesser = parseFloat(document.getElementById("neuerDurchmesser").value);
+            const offset = parseFloat(document.getElementById("offset").value);
+
+            if (isNaN(originalDurchmesser) || isNaN(neuerDurchmesser) || isNaN(offset)) {
+                alert("Bitte geben Sie gültige Zahlen ein.");
+                return;
+            }
+
+            const originalFläche = Math.PI * Math.pow(originalDurchmesser / 2, 2);
+            const neueFläche = Math.PI * Math.pow(neuerDurchmesser / 2, 2);
+            const prozentualerUnterschied = (neueFläche - originalFläche) / originalFläche;
+
+            for (let i = 0; i < 256; i++) {
+                const sensorWert = parseFloat(document.getElementById(`sensorWert${i}`).value) || 0;
+                const neuerSensorWert = sensorWert * (1 + prozentualerUnterschied);
+                const ergebnisWert = neuerSensorWert - offset;
+
+                document.getElementById(`neuerSensorWert${i}`).innerText = neuerSensorWert.toFixed(2);
+                document.getElementById(`ergebnisWert${i}`).innerText = ergebnisWert.toFixed(2);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Sensorwert-Tabelle mit Validierung</h1>
+    <label for="originalDurchmesser">Original Gehäusedurchmesser (mm):</label>
+    <input type="number" id="originalDurchmesser" required>
+    <label for="neuerDurchmesser">Neuer Gehäusedurchmesser (mm):</label>
+    <input type="number" id="neuerDurchmesser" required>
+    <label for="offset">Offset-Wert:</label>
+    <input type="number" id="offset" required>
+    <button onclick="berechneWerte()">Berechnen</button>
+
+    <table border="1">
+        <tr>
+            <th>Sensorspannung (V)</th>
+            <th>Sensorwert</th>
+            <th>Neuer Sensorwert</th>
+            <th>Ergebniswert</th>
+        </tr>
+        <tbody>
+            <script>
+                for (let i = 0; i < 256; i++) {
+                    document.write(`<tr>
+                        <td>${(i * 5 / 256).toFixed(2)}</td>
+                        <td><input type="number" id="sensorWert${i}" /></td>
+                        <td id="neuerSensorWert${i}"></td>
+                        <td id="ergebnisWert${i}"></td>
+                    </tr>`);
+                }
+            </script>
+        </tbody>
+    </table>
+</body>
+</html>
